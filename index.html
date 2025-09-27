@@ -7,18 +7,45 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1>iFixParts</h1>
-        <p>Магазин запчастей для телефонов</p>
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">iFixParts</h1>
+            <button id="cart-button" class="cart-button">
+                Корзина (<span id="cart-count">0</span>)
+            </button>
+        </div>
     </header>
-    
-    <main>
-        <h2>Скоро здесь будет каталог товаров!</h2>
-        <p>Мы работаем над созданием магазина</p>
+
+    <main class="main">
+        <div class="container">
+            <section class="catalog">
+                <h2>Каталог запчастей</h2>
+                <div id="products-container" class="products-grid">
+                    <!-- Товары появятся здесь через JavaScript -->
+                </div>
+            </section>
+        </div>
     </main>
 
-    <footer>
-        <p>© 2024 iFixParts</p>
+    <!-- Модальное окно корзины -->
+    <div id="cart-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Ваша корзина</h2>
+            <div id="cart-items" class="cart-items">
+                <!-- Товары корзины появятся здесь -->
+            </div>
+            <div class="cart-total">
+                <strong>Итого: <span id="total-price">0</span> руб.</strong>
+            </div>
+            <button id="checkout-btn" class="checkout-btn">Оформить заказ</button>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 iFixParts. Все права защищены.</p>
+        </div>
     </footer>
 
     <script src="script.js"></script>
