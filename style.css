@@ -313,3 +313,109 @@ body {
 .quantity-btn:active, .remove-btn:active {
     transform: scale(0.9);
 }
+
+/* Стили для формы заказа */
+.order-form {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #eee;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+}
+
+.form-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.back-btn {
+    background: #95a5a6;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    flex: 1;
+}
+
+.back-btn:hover {
+    background: #7f8c8d;
+}
+
+.submit-btn {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    flex: 2;
+    font-size: 1.1rem;
+}
+
+.submit-btn:hover {
+    background: #219a52;
+}
+
+/* Сообщение об успехе */
+.order-success {
+    text-align: center;
+    padding: 2rem;
+    background: #f8fff9;
+    border: 2px solid #27ae60;
+    border-radius: 10px;
+    margin-top: 2rem;
+}
+
+.order-success h3 {
+    color: #27ae60;
+    margin-bottom: 1rem;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Улучшаем отображение карточек товаров */
+.product-card h3 {
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+    color: #2c3e50;
+    min-height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-card p {
+    color: #666;
+    margin: 0.5rem 0;
+    min-height: 3rem;
+}

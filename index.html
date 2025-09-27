@@ -28,25 +28,56 @@
     </main>
 
     <!-- Модальное окно корзины -->
-    <div id="cart-modal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Ваша корзина</h2>
-            <div id="cart-items" class="cart-items">
-                <!-- Товары корзины появятся здесь -->
+<div id="cart-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Ваша корзина</h2>
+        <div id="cart-items" class="cart-items">
+            <!-- Товары корзины появятся здесь -->
+        </div>
+        <div class="cart-total">
+            <strong>Итого: <span id="total-price">0</span> руб.</strong>
+        </div>
+        <button id="checkout-btn" class="checkout-btn">Оформить заказ</button>
+
+        <!-- Форма заказа (изначально скрыта) -->
+        <form id="order-form" class="order-form hidden">
+            <h3>Оформление заказа</h3>
+            
+            <div class="form-group">
+                <label for="firstName">Имя:</label>
+                <input type="text" id="firstName" name="firstName" required>
             </div>
-            <div class="cart-total">
-                <strong>Итого: <span id="total-price">0</span> руб.</strong>
+            
+            <div class="form-group">
+                <label for="lastName">Фамилия:</label>
+                <input type="text" id="lastName" name="lastName" required>
             </div>
-            <button id="checkout-btn" class="checkout-btn">Оформить заказ</button>
+            
+            <div class="form-group">
+                <label for="address">Адрес доставки:</label>
+                <textarea id="address" name="address" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Телефон:</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            
+            <div class="form-buttons">
+                <button type="button" id="back-to-cart" class="back-btn">Назад к корзине</button>
+                <button type="submit" class="submit-btn">Создать заказ</button>
+            </div>
+        </form>
+
+        <!-- Сообщение об успехе -->
+        <div id="order-success" class="order-success hidden">
+            <h3>✅ Заказ создан!</h3>
+            <p>Спасибо за покупку! Мы свяжемся с вами в ближайшее время для подтверждения заказа.</p>
+            <button id="close-cart" class="submit-btn">Закрыть</button>
         </div>
     </div>
-
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 iFixParts. Все права защищены.</p>
-        </div>
-    </footer>
+</div>
 
     <script src="script.js"></script>
 </body>

@@ -71,11 +71,18 @@ document.addEventListener('DOMContentLoaded', function() {
     updateCartUI();
 });
 
+// ... остальной код остается таким же ...
+
 // Настройка обработчиков событий
 function setupEventListeners() {
     cartButton.addEventListener('click', openCart);
     closeModal.addEventListener('click', closeCart);
     checkoutBtn.addEventListener('click', showOrderForm);
+    
+    // Форма заказа
+    document.getElementById('back-to-cart').addEventListener('click', showCart);
+    document.getElementById('order-form').addEventListener('submit', submitOrder);
+    document.getElementById('close-cart').addEventListener('click', closeCartAfterOrder);
     
     // Закрытие модального окна при клике вне его
     window.addEventListener('click', function(event) {
@@ -85,159 +92,77 @@ function setupEventListeners() {
     });
 }
 
-// Рендер товаров
-function renderProducts() {
-    productsContainer.innerHTML = '';
-    
-    products.forEach(product => {
-        const cartItem = cart.find(item => item.productId === product.id);
-        const currentQuantity = cartItem ? cartItem.quantity : 0;
-        const isOutOfStock = currentQuantity >= product.inStock;
-        
-        const productCard = document.createElement('div');
-        productCard.className = 'product-card';
-        productCard.innerHTML = `
-            <img src="${product.image}" alt="${product.name}" class="product-image">
-            <h3>${product.name}</h3>
-            <p>${product.description}</p>
-            <div class="product-price">${product.price} руб.</div>
-            <div class="stock">В наличии: ${product.inStock} шт.</div>
-            <button class="add-to-cart" 
-                    onclick="addToCart(${product.id})" 
-                    ${isOutOfStock ? 'disabled' : ''}>
-                ${isOutOfStock ? 'Нет в наличии' : 'Добавить в корзину'}
-            </button>
-            ${currentQuantity > 0 ? `<div class="in-cart">В корзине: ${currentQuantity} шт.</div>` : ''}
-        `;
-        productsContainer.appendChild(productCard);
-    });
-}
+// ... остальные функции остаются такими же до showOrderForm ...
 
-// Функции корзины
-function addToCart(productId) {
-    const product = products.find(p => p.id === productId);
-    const cartItem = cart.find(item => item.productId === productId);
-    
-    if (cartItem) {
-        if (cartItem.quantity < product.inStock) {
-            cartItem.quantity++;
-        } else {
-            alert('Недостаточно товара в наличии!');
-            return;
-        }
-    } else {
-        cart.push({
-            productId: productId,
-            quantity: 1
-        });
-    }
-    
-    updateCart();
-}
-
-function removeFromCart(productId) {
-    cart = cart.filter(item => item.productId !== productId);
-    updateCart();
-}
-
-function changeQuantity(productId, change) {
-    const cartItem = cart.find(item => item.productId === productId);
-    const product = products.find(p => p.id === productId);
-    
-    if (cartItem) {
-        cartItem.quantity += change;
-        
-        if (cartItem.quantity <= 0) {
-            removeFromCart(productId);
-        } else if (cartItem.quantity > product.inStock) {
-            cartItem.quantity = product.inStock;
-            alert('Недостаточно товара в наличии!');
-        }
-    }
-    
-    updateCart();
-}
-
-function updateCart() {
-    saveCartToLocalStorage();
-    updateCartUI();
-    renderProducts(); // Обновляем кнопки товаров
-}
-
-function updateCartUI() {
-    // Обновляем счетчик в хедере
-    const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
-    cartCount.textContent = totalItems;
-    
-    // Обновляем содержимое корзины
-    renderCartItems();
-    
-    // Обновляем итоговую сумму
-    updateTotalPrice();
-}
-
-function renderCartItems() {
-    cartItems.innerHTML = '';
-    
-    if (cart.length === 0) {
-        cartItems.innerHTML = '<p>Корзина пуста. Добавьте товары из каталога!</p>';
-        return;
-    }
-    
-    cart.forEach(item => {
-        const product = products.find(p => p.id === item.productId);
-        const cartItemElement = document.createElement('div');
-        cartItemElement.className = 'cart-item';
-        cartItemElement.innerHTML = `
-            <div class="cart-item-info">
-                <h4>${product.name}</h4>
-                <p>${product.price} руб. × ${item.quantity} = ${product.price * item.quantity} руб.</p>
-            </div>
-            <div class="quantity-controls">
-                <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
-                <span class="quantity">${item.quantity}</span>
-                <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
-                <button class="remove-btn" onclick="removeFromCart(${product.id})">×</button>
-            </div>
-        `;
-        cartItems.appendChild(cartItemElement);
-    });
-}
-
-function updateTotalPrice() {
-    const total = cart.reduce((sum, item) => {
-        const product = products.find(p => p.id === item.productId);
-        return sum + (product.price * item.quantity);
-    }, 0);
-    totalPrice.textContent = total;
-}
-
-// Работа с модальным окном
-function openCart() {
-    cartModal.style.display = 'block';
-}
-
-function closeCart() {
-    cartModal.style.display = 'none';
-}
-
-// Форма заказа (заглушка)
+// Форма заказа
 function showOrderForm() {
     if (cart.length === 0) {
         alert('Корзина пуста! Добавьте товары перед оформлением заказа.');
         return;
     }
-    alert('Форма оформления заказа будет на следующем этапе!');
+    
+    // Скрываем корзину, показываем форму
+    document.getElementById('cart-items').classList.add('hidden');
+    document.querySelector('.cart-total').classList.add('hidden');
+    checkoutBtn.classList.add('hidden');
+    document.getElementById('order-form').classList.remove('hidden');
 }
 
-// LocalStorage
-function saveCartToLocalStorage() {
-    localStorage.setItem('cart', JSON.stringify(cart));
+function showCart() {
+    // Показываем корзину, скрываем форму
+    document.getElementById('cart-items').classList.remove('hidden');
+    document.querySelector('.cart-total').classList.remove('hidden');
+    checkoutBtn.classList.remove('hidden');
+    document.getElementById('order-form').classList.add('hidden');
 }
 
-function loadCartFromLocalStorage() {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-        cart = JSON.parse(savedCart);
-    }
+function submitOrder(event) {
+    event.preventDefault();
+    
+    // Получаем данные формы
+    const formData = new FormData(document.getElementById('order-form'));
+    const orderData = {
+        firstName: formData.get('firstName'),
+        lastName: formData.get('lastName'),
+        address: formData.get('address'),
+        phone: formData.get('phone'),
+        items: cart,
+        total: calculateTotal(),
+        date: new Date().toLocaleString()
+    };
+    
+    // В реальном приложении здесь бы была отправка на сервер
+    console.log('Заказ создан:', orderData);
+    
+    // Показываем сообщение об успехе
+    document.getElementById('order-form').classList.add('hidden');
+    document.getElementById('order-success').classList.remove('hidden');
+    
+    // Очищаем корзину через 5 секунд
+    setTimeout(() => {
+        cart = [];
+        updateCart();
+        document.getElementById('order-success').classList.add('hidden');
+        showCart();
+        document.getElementById('order-form').reset();
+        closeCart();
+    }, 5000);
 }
+
+function closeCartAfterOrder() {
+    cart = [];
+    updateCart();
+    document.getElementById('order-success').classList.add('hidden');
+    showCart();
+    document.getElementById('order-form').reset();
+    closeCart();
+}
+
+function calculateTotal() {
+    return cart.reduce((sum, item) => {
+        const product = products.find(p => p.id === item.productId);
+        return sum + (product.price * item.quantity);
+    }, 0);
+}
+
+// ... остальной код остается таким же ...
