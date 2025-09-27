@@ -57,22 +57,46 @@ let cart = [];
 const productsContainer = document.getElementById('products-container');
 const cartButton = document.getElementById('cart-button');
 const cartModal = document.getElementById('cart-modal');
+const orderModal = document.getElementById('order-modal');
+const successModal = document.getElementById('success-modal');
 const cartItems = document.getElementById('cart-items');
+const orderItems = document.getElementById('order-items');
 const cartCount = document.getElementById('cart-count');
 const totalPrice = document.getElementById('total-price');
+const orderTotalPrice = document.getElementById('order-total-price');
 const closeModal = document.querySelector('.close');
+const closeOrder = document.querySelector('.close-order');
+const closeSuccess = document.getElementById('close-success');
 const checkoutBtn = document.getElementById('checkout-btn');
+const orderForm = document.getElementById('order-form');
 
-// Инициализация при загрузке страницы
+// Инициализация
 document.addEventListener('DOMContentLoaded', function() {
     loadCartFromLocalStorage();
-    renderProducts(); // ТЕПЕРЬ ЭТА ФУНКЦИЯ ЕСТЬ!
+    renderProducts();
     setupEventListeners();
     updateCartUI();
-    fixButtonText();
 });
 
-// НАША ФУНКЦИЯ renderProducts!
+// Настройка обработчиков
+function setupEventListeners() {
+    cartButton.addEventListener('click', () => openModal(cartModal));
+    closeModal.addEventListener('click', () => closeModal(cartModal));
+    closeOrder.addEventListener('click', () => closeModal(orderModal));
+    closeSuccess.addEventListener('click', () => closeModal(successModal));
+    
+    checkoutBtn.addEventListener('click', openOrderModal);
+    orderForm.addEventListener('submit', submitOrder);
+    
+    // Закрытие при клике вне окна
+    window.addEventListener('click', function(event) {
+        if (event.target === cartModal) closeModal(cartModal);
+        if (event.target === orderModal) closeModal(orderModal);
+        if (event.target === successModal) closeModal(successModal);
+    });
+}
+
+// Рендер товаров
 function renderProducts() {
     productsContainer.innerHTML = '';
     
@@ -100,38 +124,6 @@ function renderProducts() {
     });
 }
 
-// Исправляем опечатку в кнопках
-function fixButtonText() {
-    const buttons = document.querySelectorAll('.add-to-cart');
-    buttons.forEach(button => {
-        if (button.textContent.includes('и корзину')) {
-            button.textContent = button.textContent.replace('и корзину', 'в корзину');
-        }
-        if (button.textContent.includes('и корзину')) {
-            button.textContent = 'Добавить в корзину';
-        }
-    });
-}
-
-// Настройка обработчиков событий
-function setupEventListeners() {
-    cartButton.addEventListener('click', openCart);
-    closeModal.addEventListener('click', closeCart);
-    checkoutBtn.addEventListener('click', showOrderForm);
-    
-    // Форма заказа
-    document.getElementById('back-to-cart').addEventListener('click', showCart);
-    document.getElementById('order-form').addEventListener('submit', submitOrder);
-    document.getElementById('close-cart').addEventListener('click', closeCartAfterOrder);
-    
-    // Закрытие модального окна при клике вне его
-    window.addEventListener('click', function(event) {
-        if (event.target === cartModal) {
-            closeCart();
-        }
-    });
-}
-
 // Функции корзины
 function addToCart(productId) {
     const product = products.find(p => p.id === productId);
@@ -140,17 +132,14 @@ function addToCart(productId) {
     if (cartItem) {
         if (cartItem.quantity < product.inStock) {
             cartItem.quantity++;
-            showNotification(`Товар "${product.name}" добавлен в корзину!`);
+            showNotification(`✅ ${product.name} добавлен в корзину!`);
         } else {
-            showNotification('Недостаточно товара в наличии!', 'error');
+            showNotification('❌ Недостаточно товара в наличии!');
             return;
         }
     } else {
-        cart.push({
-            productId: productId,
-            quantity: 1
-        });
-        showNotification(`Товар "${product.name}" добавлен в корзину!`);
+        cart.push({ productId: productId, quantity: 1 });
+        showNotification(`✅ ${product.name} добавлен в корзину!`);
     }
     
     updateCart();
@@ -167,40 +156,30 @@ function changeQuantity(productId, change) {
     
     if (cartItem) {
         cartItem.quantity += change;
-        
-        if (cartItem.quantity <= 0) {
-            removeFromCart(productId);
-        } else if (cartItem.quantity > product.inStock) {
+        if (cartItem.quantity <= 0) removeFromCart(productId);
+        else if (cartItem.quantity > product.inStock) {
             cartItem.quantity = product.inStock;
-            showNotification('Недостаточно товара в наличии!', 'error');
+            showNotification('❌ Недостаточно товара в наличии!');
         }
     }
-    
     updateCart();
 }
 
 function updateCart() {
     saveCartToLocalStorage();
     updateCartUI();
-    renderProducts(); // Обновляем кнопки товаров
-    fixButtonText(); // Исправляем текст кнопок
+    renderProducts();
 }
 
 function updateCartUI() {
-    // Обновляем счетчик в хедере
     const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
     cartCount.textContent = totalItems;
-    
-    // Обновляем содержимое корзины
     renderCartItems();
-    
-    // Обновляем итоговую сумму
     updateTotalPrice();
 }
 
 function renderCartItems() {
     cartItems.innerHTML = '';
-    
     if (cart.length === 0) {
         cartItems.innerHTML = '<p>Корзина пуста. Добавьте товары из каталога!</p>';
         return;
@@ -213,7 +192,7 @@ function renderCartItems() {
         cartItemElement.innerHTML = `
             <div class="cart-item-info">
                 <h4>${product.name}</h4>
-                <p>${product.price} руб. × ${item.quantity} = ${product.price * item.quantity} руб.</p>
+                <p>${product.price} руб. × ${item.quantity}</p>
             </div>
             <div class="quantity-controls">
                 <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
@@ -232,79 +211,69 @@ function updateTotalPrice() {
         return sum + (product.price * item.quantity);
     }, 0);
     totalPrice.textContent = total;
+    orderTotalPrice.textContent = total;
 }
 
-// Работа с модальным окном
-function openCart() {
-    cartModal.style.display = 'block';
+// Модальные окна
+function openModal(modal) {
+    modal.style.display = 'block';
 }
 
-function closeCart() {
-    cartModal.style.display = 'none';
+function closeModal(modal) {
+    modal.style.display = 'none';
 }
 
-// Форма заказа
-function showOrderForm() {
+function openOrderModal() {
     if (cart.length === 0) {
-        showNotification('Корзина пуста! Добавьте товары перед оформлением заказа.', 'error');
+        showNotification('❌ Корзина пуста! Добавьте товары.');
         return;
     }
     
-    // Скрываем корзину, показываем форму
-    document.getElementById('cart-items').classList.add('hidden');
-    document.querySelector('.cart-total').classList.add('hidden');
-    checkoutBtn.classList.add('hidden');
-    document.getElementById('order-form').classList.remove('hidden');
-}
-
-function showCart() {
-    // Показываем корзину, скрываем форму
-    document.getElementById('cart-items').classList.remove('hidden');
-    document.querySelector('.cart-total').classlist.remove('hidden');
-    checkoutBtn.classList.remove('hidden');
-    document.getElementById('order-form').classList.add('hidden');
+    // Заполняем список товаров в форме
+    orderItems.innerHTML = '';
+    cart.forEach(item => {
+        const product = products.find(p => p.id === item.productId);
+        const orderItem = document.createElement('div');
+        orderItem.className = 'order-item';
+        orderItem.innerHTML = `
+            <span>${product.name} × ${item.quantity}</span>
+            <span>${product.price * item.quantity} руб.</span>
+        `;
+        orderItems.appendChild(orderItem);
+    });
+    
+    closeModal(cartModal);
+    openModal(orderModal);
 }
 
 function submitOrder(event) {
     event.preventDefault();
     
-    // Получаем данные формы
-    const formData = new FormData(document.getElementById('order-form'));
+    const formData = new FormData(orderForm);
     const orderData = {
         firstName: formData.get('firstName'),
         lastName: formData.get('lastName'),
-        address: formData.get('address'),
         phone: formData.get('phone'),
+        address: formData.get('address'),
         items: cart,
         total: calculateTotal(),
         date: new Date().toLocaleString()
     };
     
-    // В реальном приложении здесь бы была отправка на сервер
+    // В реальном приложении здесь отправка на сервер
     console.log('Заказ создан:', orderData);
     
-    // Показываем сообщение об успехе
-    document.getElementById('order-form').classList.add('hidden');
-    document.getElementById('order-success').classList.remove('hidden');
+    // Показываем успех
+    closeModal(orderModal);
+    openModal(successModal);
     
-    // Очищаем корзину через 5 секунд
+    // Очищаем корзину
     setTimeout(() => {
         cart = [];
         updateCart();
-        document.getElementById('order-success').classList.add('hidden');
-        showCart();
-        document.getElementById('order-form').reset();
-        closeCart();
+        orderForm.reset();
+        closeModal(successModal);
     }, 5000);
-}
-
-function closeCartAfterOrder() {
-    cart = [];
-    updateCart();
-    document.getElementById('order-success').classList.add('hidden');
-    showCart();
-    document.getElementById('order-form').reset();
-    closeCart();
 }
 
 function calculateTotal() {
@@ -315,20 +284,15 @@ function calculateTotal() {
 }
 
 // Уведомления
-function showNotification(message, type = 'success') {
-    // Создаем уведомление только если его нет
-    if (document.querySelector('.notification')) return;
-    
+function showNotification(message) {
     const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
+    notification.className = 'notification';
     notification.textContent = message;
-    notification.style.background = type === 'error' ? '#e74c3c' : '#27ae60';
+    notification.style.background = message.includes('❌') ? '#e74c3c' : '#27ae60';
     
     document.body.appendChild(notification);
     
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
+    setTimeout(() => notification.remove(), 3000);
 }
 
 // LocalStorage
@@ -338,7 +302,5 @@ function saveCartToLocalStorage() {
 
 function loadCartFromLocalStorage() {
     const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-        cart = JSON.parse(savedCart);
-    }
+    if (savedCart) cart = JSON.parse(savedCart);
 }

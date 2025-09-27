@@ -28,54 +28,67 @@
     </main>
 
     <!-- Модальное окно корзины -->
+<!-- Модальное окно корзины -->
 <div id="cart-modal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
-        <h2>Ваша корзина</h2>
+        <h2>🛒 Ваша корзина</h2>
         <div id="cart-items" class="cart-items">
             <!-- Товары корзины появятся здесь -->
         </div>
         <div class="cart-total">
             <strong>Итого: <span id="total-price">0</span> руб.</strong>
         </div>
-        <button id="checkout-btn" class="checkout-btn">Оформить заказ</button>
+        <button id="checkout-btn" class="checkout-btn">💳 Оформить заказ</button>
+    </div>
+</div>
 
-        <!-- Форма заказа (изначально скрыта) -->
-        <form id="order-form" class="order-form hidden">
-            <h3>Оформление заказа</h3>
-            
+<!-- Модальное окно оформления заказа -->
+<div id="order-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-order">&times;</span>
+        <h2>📦 Оформление заказа</h2>
+        
+        <form id="order-form">
             <div class="form-group">
-                <label for="firstName">Имя:</label>
-                <input type="text" id="firstName" name="firstName" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="lastName">Фамилия:</label>
-                <input type="text" id="lastName" name="lastName" required>
+                <label for="firstName">👤 Имя *</label>
+                <input type="text" id="firstName" name="firstName" required placeholder="Введите ваше имя">
             </div>
             
             <div class="form-group">
-                <label for="address">Адрес доставки:</label>
-                <textarea id="address" name="address" required></textarea>
+                <label for="lastName">👥 Фамилия *</label>
+                <input type="text" id="lastName" name="lastName" required placeholder="Введите вашу фамилию">
             </div>
             
             <div class="form-group">
-                <label for="phone">Телефон:</label>
-                <input type="tel" id="phone" name="phone" required>
+                <label for="phone">📞 Телефон *</label>
+                <input type="tel" id="phone" name="phone" required placeholder="+7 (999) 123-45-67">
             </div>
             
-            <div class="form-buttons">
-                <button type="button" id="back-to-cart" class="back-btn">Назад к корзине</button>
-                <button type="submit" class="submit-btn">Создать заказ</button>
+            <div class="form-group">
+                <label for="address">🏠 Адрес доставки *</label>
+                <textarea id="address" name="address" required placeholder="Улица, дом, квартира"></textarea>
             </div>
+            
+            <div class="order-summary">
+                <h3>Ваш заказ:</h3>
+                <div id="order-items"></div>
+                <div class="order-total">
+                    <strong>Общая сумма: <span id="order-total-price">0</span> руб.</strong>
+                </div>
+            </div>
+            
+            <button type="submit" class="submit-btn">✅ Создать заказ</button>
         </form>
+    </div>
+</div>
 
-        <!-- Сообщение об успехе -->
-        <div id="order-success" class="order-success hidden">
-            <h3>✅ Заказ создан!</h3>
-            <p>Спасибо за покупку! Мы свяжемся с вами в ближайшее время для подтверждения заказа.</p>
-            <button id="close-cart" class="submit-btn">Закрыть</button>
-        </div>
+<!-- Модальное окно успеха -->
+<div id="success-modal" class="modal">
+    <div class="modal-content success-content">
+        <h2>🎉 Заказ создан!</h2>
+        <p>Спасибо за покупку! Мы свяжемся с вами в ближайшее время для подтверждения заказа.</p>
+        <button id="close-success" class="submit-btn">Закрыть</button>
     </div>
 </div>
 
