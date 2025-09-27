@@ -11,7 +11,7 @@
         <div class="container">
             <h1 class="logo">iFixParts</h1>
             <button id="cart-button" class="cart-button">
-                Корзина (<span id="cart-count">0</span>)
+                🛒 Корзина (<span id="cart-count">0</span>)
             </button>
         </div>
     </header>
@@ -28,87 +28,26 @@
     </main>
 
     <!-- Модальное окно корзины -->
-<!-- Модальное окно корзины -->
-<div id="cart-modal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>🛒 Ваша корзина</h2>
-        <div id="cart-items" class="cart-items">
-            <!-- Товары корзины появятся здесь -->
+    <div id="cart-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>🛒 Ваша корзина</h2>
+            <div id="cart-items" class="cart-items">
+                <p>Корзина пуста. Добавьте товары из каталога!</p>
+            </div>
+            <div class="cart-total">
+                <strong>Итого: <span id="total-price">0</span> руб.</strong>
+            </div>
+            <button id="checkout-btn" class="checkout-btn">💳 Оформить заказ</button>
         </div>
-        <div class="cart-total">
-            <strong>Итого: <span id="total-price">0</span> руб.</strong>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 iFixParts. Все права защищены.</p>
         </div>
-        <button id="checkout-btn" class="checkout-btn">💳 Оформить заказ</button>
-    </div>
-</div>
-
-<!-- Модальное окно оформления заказа -->
-<div id="order-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-order">&times;</span>
-        <h2>📦 Оформление заказа</h2>
-        
-        <form id="order-form">
-            <div class="form-group">
-                <label for="firstName">👤 Имя *</label>
-                <input type="text" id="firstName" name="firstName" required placeholder="Введите ваше имя">
-            </div>
-            
-            <div class="form-group">
-                <label for="lastName">👥 Фамилия *</label>
-                <input type="text" id="lastName" name="lastName" required placeholder="Введите вашу фамилию">
-            </div>
-            
-            <div class="form-group">
-                <label for="phone">📞 Телефон *</label>
-                <input type="tel" id="phone" name="phone" required placeholder="+7 (999) 123-45-67">
-            </div>
-            
-            <div class="form-group">
-                <label for="address">🏠 Адрес доставки *</label>
-                <textarea id="address" name="address" required placeholder="Улица, дом, квартира"></textarea>
-            </div>
-            
-            <div class="order-summary">
-                <h3>Ваш заказ:</h3>
-                <div id="order-items"></div>
-                <div class="order-total">
-                    <strong>Общая сумма: <span id="order-total-price">0</span> руб.</strong>
-                </div>
-            </div>
-            
-            <button type="submit" class="submit-btn">✅ Создать заказ</button>
-        </form>
-    </div>
-</div>
-
-<!-- Модальное окно успеха -->
-<div id="success-modal" class="modal">
-    <div class="modal-content success-content">
-        <h2>🎉 Заказ создан!</h2>
-        <p>Спасибо за покупку! Мы свяжемся с вами в ближайшее время для подтверждения заказа.</p>
-        <button id="close-success" class="submit-btn">Закрыть</button>
-    </div>
-</div>
+    </footer>
 
     <script src="script.js"></script>
 </body>
 </html>
-
-<!-- Для отладки -->
-<div id="debug" style="position: fixed; bottom: 10px; left: 10px; background: #333; color: white; padding: 10px; font-size: 12px; display: none;">
-    Debug Info
-</div>
-
-<script>
-// Временная отладочная информация
-setTimeout(() => {
-    const debugInfo = `
-        Cart: ${localStorage.getItem('cart') || 'empty'}
-        Cart length: ${JSON.parse(localStorage.getItem('cart') || '[]').length}
-    `;
-    document.getElementById('debug').innerHTML = debugInfo;
-    document.getElementById('debug').style.display = 'block';
-}, 1000);
-</script>
