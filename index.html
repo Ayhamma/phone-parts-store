@@ -95,3 +95,20 @@
     <script src="script.js"></script>
 </body>
 </html>
+
+<!-- Для отладки -->
+<div id="debug" style="position: fixed; bottom: 10px; left: 10px; background: #333; color: white; padding: 10px; font-size: 12px; display: none;">
+    Debug Info
+</div>
+
+<script>
+// Временная отладочная информация
+setTimeout(() => {
+    const debugInfo = `
+        Cart: ${localStorage.getItem('cart') || 'empty'}
+        Cart length: ${JSON.parse(localStorage.getItem('cart') || '[]').length}
+    `;
+    document.getElementById('debug').innerHTML = debugInfo;
+    document.getElementById('debug').style.display = 'block';
+}, 1000);
+</script>
