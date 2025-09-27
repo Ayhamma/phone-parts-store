@@ -257,3 +257,59 @@ body {
         grid-template-columns: repeat(3, 1fr);
     }
 }
+
+/* Стили для количества товара в корзине */
+.in-cart {
+    background: #27ae60;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    display: inline-block;
+}
+
+.cart-item-info {
+    flex: 1;
+}
+
+.cart-item-info h4 {
+    margin: 0 0 0.5rem 0;
+    color: #2c3e50;
+}
+
+.cart-item-info p {
+    margin: 0;
+    color: #666;
+}
+
+.quantity {
+    min-width: 30px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Анимации */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-content {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Эффекты при добавлении в корзину */
+.add-to-cart:active {
+    transform: scale(0.95);
+}
+
+.quantity-btn:active, .remove-btn:active {
+    transform: scale(0.9);
+}
