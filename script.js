@@ -87,7 +87,15 @@ function addToCart(productId) {
     }
     
     updateCart();
-    alert(`Товар "${product.name}" добавлен в корзину!`);
+    
+    // Animate cart button bump instead of alert
+    const cartButton = document.getElementById('cart-button');
+    if (cartButton) {
+        cartButton.classList.add('bump');
+        setTimeout(() => {
+            cartButton.classList.remove('bump');
+        }, 300);
+    }
 }
 
 function updateCart() {
@@ -125,7 +133,7 @@ function renderCartItems() {
     cartItems.innerHTML = '';
     
     if (cart.length === 0) {
-        cartItems.innerHTML = '<p>Корзина пуста. Добавьте товары из каталога!</p>';
+        cartItems.innerHTML = '<p style="text-align: center; color: var(--muted); padding: 2rem;">Корзина пуста. Добавьте товары из каталога!</p>';
         return;
     }
     
@@ -134,15 +142,16 @@ function renderCartItems() {
         const cartItemElement = document.createElement('div');
         cartItemElement.className = 'cart-item';
         cartItemElement.innerHTML = `
+            <img src="${product.image}" alt="${product.name}" class="cart-thumb">
             <div class="cart-item-info">
                 <h4>${product.name}</h4>
-                <p>${product.price} руб. × ${item.quantity}</p>
+                <p>${product.price} руб. × ${item.quantity} = ${product.price * item.quantity} руб.</p>
             </div>
             <div class="quantity-controls">
-                <button onclick="changeQuantity(${product.id}, -1)">-</button>
+                <button onclick="changeQuantity(${product.id}, -1)" title="Уменьшить">-</button>
                 <span>${item.quantity}</span>
-                <button onclick="changeQuantity(${product.id}, 1)">+</button>
-                <button onclick="removeFromCart(${product.id})">×</button>
+                <button onclick="changeQuantity(${product.id}, 1)" title="Увеличить">+</button>
+                <button onclick="removeFromCart(${product.id})" title="Удалить">×</button>
             </div>
         `;
         cartItems.appendChild(cartItemElement);
@@ -168,45 +177,145 @@ function removeFromCart(productId) {
     updateCart();
 }
 
-// Модальные окна
+// Professional Cart Drawer Events
 function setupEventListeners() {
     const cartButton = document.getElementById('cart-button');
     const cartModal = document.getElementById('cart-modal');
     const closeButton = document.querySelector('.close');
     const checkoutBtn = document.getElementById('checkout-btn');
     
+    // Open cart drawer
     if (cartButton) {
         cartButton.addEventListener('click', function() {
-            cartModal.style.display = 'block';
+            openCart();
         });
     }
     
+    // Close cart drawer
     if (closeButton) {
         closeButton.addEventListener('click', function() {
-            cartModal.style.display = 'none';
+            closeCart();
         });
     }
     
+    // Checkout with improved UX
     if (checkoutBtn) {
         checkoutBtn.addEventListener('click', function() {
             if (cart.length === 0) {
-                alert('Корзина пуста!');
+                showNotification('Корзина пуста!', 'warning');
                 return;
             }
-            alert('Заказ создан! Спасибо за покупку!');
-            cart = [];
-            updateCart();
-            cartModal.style.display = 'none';
+            
+            // Disable button to prevent double clicks
+            checkoutBtn.disabled = true;
+            checkoutBtn.textContent = 'Обрабатываем...';
+            
+            // Simulate checkout process
+            setTimeout(() => {
+                showNotification('Заказ создан! Спасибо за покупку!', 'success');
+                cart = [];
+                updateCart();
+                closeCart();
+                
+                // Re-enable button
+                checkoutBtn.disabled = false;
+                checkoutBtn.textContent = '💳 Оформить заказ';
+            }, 1000);
         });
     }
     
-    // Закрытие при клике вне окна
+    // Close cart when clicking outside
     window.addEventListener('click', function(event) {
         const cartModal = document.getElementById('cart-modal');
         if (event.target === cartModal) {
-            cartModal.style.display = 'none';
+            closeCart();
         }
     });
+    
+    // ESC key to close cart
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeCart();
+        }
+    });
+}
+
+// Cart drawer functions
+function openCart() {
+    const cartModal = document.getElementById('cart-modal');
+    if (cartModal) {
+        cartModal.classList.add('open');
+        // Focus first interactive element for accessibility
+        setTimeout(() => {
+            const firstButton = cartModal.querySelector('button');
+            if (firstButton) firstButton.focus();
+        }, 300);
+    }
+}
+
+function closeCart() {
+    const cartModal = document.getElementById('cart-modal');
+    if (cartModal) {
+        cartModal.classList.remove('open');
+    }
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()">&times;</button>
+    `;
+    
+    // Add styles if not already present
+    if (!document.getElementById('notification-styles')) {
+        const styles = document.createElement('style');
+        styles.id = 'notification-styles';
+        styles.textContent = `
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--surface);
+                border-radius: var(--radius);
+                padding: 1rem 1.5rem;
+                box-shadow: var(--shadow);
+                z-index: 2000;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                max-width: 400px;
+                border-left: 4px solid var(--primary);
+                animation: slideIn 0.3s ease;
+            }
+            .notification-success { border-left-color: var(--success); }
+            .notification-warning { border-left-color: #f39c12; }
+            .notification button {
+                background: none;
+                border: none;
+                font-size: 1.2rem;
+                cursor: pointer;
+                color: var(--muted);
+            }
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(styles);
+    }
+    
+    document.body.appendChild(notification);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    }, 3000);
 }
 
 // LocalStorage

@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iFixParts - Магазин запчастей</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -27,18 +30,22 @@
         </div>
     </main>
 
-    <!-- Модальное окно корзины -->
+    <!-- Профессиональная корзина-ящик -->
     <div id="cart-modal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>🛒 Ваша корзина</h2>
+            <div class="cart-header">
+                <h2>🛒 Ваша корзина</h2>
+                <button class="close">&times;</button>
+            </div>
             <div id="cart-items" class="cart-items">
                 <p>Корзина пуста. Добавьте товары из каталога!</p>
             </div>
-            <div class="cart-total">
-                <strong>Итого: <span id="total-price">0</span> руб.</strong>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <strong>Итого: <span id="total-price">0</span> руб.</strong>
+                </div>
+                <button id="checkout-btn" class="checkout-btn">💳 Оформить заказ</button>
             </div>
-            <button id="checkout-btn" class="checkout-btn">💳 Оформить заказ</button>
         </div>
     </div>
 
