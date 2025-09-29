@@ -4,7 +4,7 @@ const products = [
         id: 1,
         name: "Дисплей iPhone 12",
         price: 8500,
-        image: "https://via.placeholder.com/300x200/3498db/ffffff?text=iPhone+12+Display",
+        image: "imgs/1.jpg",
         description: "Оригинальный дисплейный модуль для iPhone 12",
         inStock: 15
     },
@@ -12,7 +12,7 @@ const products = [
         id: 2,
         name: "Аккумулятор Samsung S21",
         price: 2200,
-        image: "https://via.placeholder.com/300x200/e74c3c/ffffff?text=S21+Battery",
+        image: "imgs/2.jpg",
         description: "Аккумулятор для Samsung Galaxy S21",
         inStock: 8
     },
@@ -20,7 +20,7 @@ const products = [
         id: 3,
         name: "Корпус Xiaomi Redmi Note 10",
         price: 1500,
-        image: "https://via.placeholder.com/300x200/2ecc71/ffffff?text=Redmi+Case",
+        image: "imgs/3.jpg",
         description: "Задняя крышка корпуса",
         inStock: 5
     }
