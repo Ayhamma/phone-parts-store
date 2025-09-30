@@ -318,6 +318,7 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
+
 // LocalStorage
 function saveCartToLocalStorage() {
     localStorage.setItem('cart', JSON.stringify(cart));
