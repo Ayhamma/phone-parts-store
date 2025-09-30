@@ -26,20 +26,25 @@ const products = [
     }
 ];
 
-// Корзина и заказы
+// Корзина
 let cart = [];
-let orders = [];
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
+    // Загружаем корзину из LocalStorage
     loadCartFromLocalStorage();
-    loadOrdersFromLocalStorage();
+    
+    // Рендерим товары
     renderProducts();
+    
+    // Настраиваем обработчики событий
     setupEventListeners();
+    
+    // Обновляем UI корзины
     updateCartUI();
 });
 
-// Рендер товаров - ИСПРАВЛЕННАЯ ВЕРСИЯ
+// Рендер товаров
 function renderProducts() {
     const productsContainer = document.getElementById('products-container');
     if (!productsContainer) return;
@@ -83,7 +88,7 @@ function addToCart(productId) {
     
     updateCart();
     
-    // Animate cart button bump
+    // Animate cart button bump instead of alert
     const cartButton = document.getElementById('cart-button');
     if (cartButton) {
         cartButton.classList.add('bump');
@@ -201,7 +206,21 @@ function setupEventListeners() {
                 return;
             }
             
-            showCheckoutForm();
+            // Disable button to prevent double clicks
+            checkoutBtn.disabled = true;
+            checkoutBtn.textContent = 'Обрабатываем...';
+            
+            // Simulate checkout process
+            setTimeout(() => {
+                showNotification('Заказ создан! Спасибо за покупку!', 'success');
+                cart = [];
+                updateCart();
+                closeCart();
+                
+                // Re-enable button
+                checkoutBtn.disabled = false;
+                checkoutBtn.textContent = '💳 Оформить заказ';
+            }, 1000);
         });
     }
     
@@ -217,7 +236,6 @@ function setupEventListeners() {
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             closeCart();
-            closeCheckoutForm();
         }
     });
 }
@@ -227,6 +245,7 @@ function openCart() {
     const cartModal = document.getElementById('cart-modal');
     if (cartModal) {
         cartModal.classList.add('open');
+        // Focus first interactive element for accessibility
         setTimeout(() => {
             const firstButton = cartModal.querySelector('button');
             if (firstButton) firstButton.focus();
@@ -243,6 +262,7 @@ function closeCart() {
 
 // Notification system
 function showNotification(message, type = 'info') {
+    // Create notification element
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
@@ -250,8 +270,47 @@ function showNotification(message, type = 'info') {
         <button onclick="this.parentElement.remove()">&times;</button>
     `;
     
+    // Add styles if not already present
+    if (!document.getElementById('notification-styles')) {
+        const styles = document.createElement('style');
+        styles.id = 'notification-styles';
+        styles.textContent = `
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--surface);
+                border-radius: var(--radius);
+                padding: 1rem 1.5rem;
+                box-shadow: var(--shadow);
+                z-index: 2000;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                max-width: 400px;
+                border-left: 4px solid var(--primary);
+                animation: slideIn 0.3s ease;
+            }
+            .notification-success { border-left-color: var(--success); }
+            .notification-warning { border-left-color: #f39c12; }
+            .notification button {
+                background: none;
+                border: none;
+                font-size: 1.2rem;
+                cursor: pointer;
+                color: var(--muted);
+            }
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(styles);
+    }
+    
     document.body.appendChild(notification);
     
+    // Auto remove after 3 seconds
     setTimeout(() => {
         if (notification.parentElement) {
             notification.remove();
@@ -267,33 +326,13 @@ function saveCartToLocalStorage() {
 function loadCartFromLocalStorage() {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
-        try {
-            cart = JSON.parse(savedCart);
-        } catch (error) {
-            localStorage.removeItem('cart');
-            cart = [];
-        }
-    }
-}
-
-function saveOrdersToLocalStorage() {
-    localStorage.setItem('orders', JSON.stringify(orders));
-}
-
-function loadOrdersFromLocalStorage() {
-    const savedOrders = localStorage.getItem('orders');
-    if (savedOrders) {
-        try {
-            orders = JSON.parse(savedOrders);
-        } catch (error) {
-            localStorage.removeItem('orders');
-            orders = [];
-        }
+        cart = JSON.parse(savedCart);
     }
 }
 
 // Временный код для очистки проблемных данных
 setTimeout(() => {
+    // Очищаем возможные поврежденные данные
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
         try {
