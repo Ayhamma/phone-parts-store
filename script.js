@@ -26,21 +26,16 @@ const products = [
     }
 ];
 
-// Корзина
+// Корзина и заказы
 let cart = [];
+let orders = [];
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
-    // Загружаем корзину из LocalStorage
     loadCartFromLocalStorage();
-    
-    // Рендерим товары
+    loadOrdersFromLocalStorage();
     renderProducts();
-    
-    // Настраиваем обработчики событий
     setupEventListeners();
-    
-    // Обновляем UI корзины
     updateCartUI();
 });
 
@@ -177,6 +172,50 @@ function removeFromCart(productId) {
     updateCart();
 }
 
+// Система заказов и оплаты
+function createOrder(customerData) {
+    const order = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        items: [...cart],
+        total: getCartTotal(),
+        customer: customerData,
+        status: 'pending', // pending, paid, completed, cancelled
+        paymentMethod: customerData.paymentMethod
+    };
+    
+    orders.push(order);
+    saveOrdersToLocalStorage();
+    return order;
+}
+
+function getCartTotal() {
+    return cart.reduce((sum, item) => {
+        const product = products.find(p => p.id === item.productId);
+        return sum + (product.price * item.quantity);
+    }, 0);
+}
+
+function processPayment(order, cardData = null) {
+    return new Promise((resolve, reject) => {
+        // Симуляция процесса оплаты
+        showNotification('Обрабатываем платеж...', 'info');
+        
+        setTimeout(() => {
+            // В реальном приложении здесь будет интеграция с платежным шлюзом
+            const success = Math.random() > 0.2; // 80% успешных платежей для демо
+            
+            if (success) {
+                order.status = 'paid';
+                saveOrdersToLocalStorage();
+                resolve({ success: true, orderId: order.id });
+            } else {
+                reject({ success: false, error: 'Ошибка оплаты. Проверьте данные карты.' });
+            }
+        }, 2000);
+    });
+}
+
 // Professional Cart Drawer Events
 function setupEventListeners() {
     const cartButton = document.getElementById('cart-button');
@@ -206,21 +245,7 @@ function setupEventListeners() {
                 return;
             }
             
-            // Disable button to prevent double clicks
-            checkoutBtn.disabled = true;
-            checkoutBtn.textContent = 'Обрабатываем...';
-            
-            // Simulate checkout process
-            setTimeout(() => {
-                showNotification('Заказ создан! Спасибо за покупку!', 'success');
-                cart = [];
-                updateCart();
-                closeCart();
-                
-                // Re-enable button
-                checkoutBtn.disabled = false;
-                checkoutBtn.textContent = '💳 Оформить заказ';
-            }, 1000);
+            showCheckoutForm();
         });
     }
     
@@ -236,8 +261,238 @@ function setupEventListeners() {
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             closeCart();
+            closeCheckoutForm();
         }
     });
+}
+
+// Форма оформления заказа
+function showCheckoutForm() {
+    const total = getCartTotal();
+    
+    const checkoutHTML = `
+        <div class="checkout-overlay">
+            <div class="checkout-modal">
+                <div class="checkout-header">
+                    <h2>💳 Оформление заказа</h2>
+                    <button class="close-checkout">&times;</button>
+                </div>
+                
+                <div class="checkout-content">
+                    <div class="order-summary">
+                        <h3>Ваш заказ</h3>
+                        ${cart.map(item => {
+                            const product = products.find(p => p.id === item.productId);
+                            return `<div class="order-item">
+                                <span>${product.name} × ${item.quantity}</span>
+                                <span>${product.price * item.quantity} руб.</span>
+                            </div>`;
+                        }).join('')}
+                        <div class="order-total">
+                            <strong>Итого: ${total} руб.</strong>
+                        </div>
+                    </div>
+                    
+                    <form id="checkout-form" class="checkout-form">
+                        <h3>Данные для доставки</h3>
+                        
+                        <div class="form-group">
+                            <label for="customer-name">ФИО *</label>
+                            <input type="text" id="customer-name" name="name" required placeholder="Иванов Иван Иванович">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customer-email">Email *</label>
+                            <input type="email" id="customer-email" name="email" required placeholder="ivanov@example.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customer-phone">Телефон *</label>
+                            <input type="tel" id="customer-phone" name="phone" required placeholder="+7 (999) 999-99-99">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customer-address">Адрес доставки *</label>
+                            <textarea id="customer-address" name="address" required placeholder="Город, улица, дом, квартира"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Способ оплаты *</label>
+                            <div class="payment-methods">
+                                <label class="payment-method">
+                                    <input type="radio" name="paymentMethod" value="card" checked>
+                                    <span>💳 Банковская карта</span>
+                                </label>
+                                <label class="payment-method">
+                                    <input type="radio" name="paymentMethod" value="cash">
+                                    <span>💰 Наличные при получении</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div id="card-data" class="card-data">
+                            <h4>Данные карты</h4>
+                            <div class="form-group">
+                                <label for="card-number">Номер карты</label>
+                                <input type="text" id="card-number" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="card-expiry">Срок действия</label>
+                                    <input type="text" id="card-expiry" name="cardExpiry" placeholder="ММ/ГГ" maxlength="5">
+                                </div>
+                                <div class="form-group">
+                                    <label for="card-cvc">CVC</label>
+                                    <input type="text" id="card-cvc" name="cardCvc" placeholder="123" maxlength="3">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="pay-now-btn">
+                            💳 Оплатить ${total} руб.
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', checkoutHTML);
+    
+    // Настройка обработчиков событий для формы
+    setupCheckoutFormEvents();
+}
+
+function setupCheckoutFormEvents() {
+    const closeBtn = document.querySelector('.close-checkout');
+    const checkoutForm = document.getElementById('checkout-form');
+    const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
+    const cardData = document.getElementById('card-data');
+    
+    // Закрытие формы
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeCheckoutForm);
+    }
+    
+    // Переключение способов оплаты
+    paymentMethods.forEach(method => {
+        method.addEventListener('change', function() {
+            if (this.value === 'card') {
+                cardData.style.display = 'block';
+            } else {
+                cardData.style.display = 'none';
+            }
+        });
+    });
+    
+    // Обработка отправки формы
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', handleCheckoutSubmit);
+    }
+    
+    // Маска для номера карты
+    const cardNumber = document.getElementById('card-number');
+    if (cardNumber) {
+        cardNumber.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            let matches = value.match(/\d{4,16}/g);
+            let match = matches && matches[0] || '';
+            let parts = [];
+            
+            for (let i = 0; i < match.length; i += 4) {
+                parts.push(match.substring(i, i + 4));
+            }
+            
+            if (parts.length) {
+                e.target.value = parts.join(' ');
+            }
+        });
+    }
+    
+    // Маска для срока действия
+    const cardExpiry = document.getElementById('card-expiry');
+    if (cardExpiry) {
+        cardExpiry.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                e.target.value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+        });
+    }
+}
+
+async function handleCheckoutSubmit(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const customerData = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        address: formData.get('address'),
+        paymentMethod: formData.get('paymentMethod')
+    };
+    
+    const submitBtn = e.target.querySelector('.pay-now-btn');
+    const originalText = submitBtn.textContent;
+    
+    // Валидация
+    if (!customerData.name || !customerData.email || !customerData.phone || !customerData.address) {
+        showNotification('Пожалуйста, заполните все обязательные поля', 'warning');
+        return;
+    }
+    
+    if (customerData.paymentMethod === 'card') {
+        const cardNumber = formData.get('cardNumber').replace(/\s/g, '');
+        const cardExpiry = formData.get('cardExpiry');
+        const cardCvc = formData.get('cardCvc');
+        
+        if (!cardNumber || cardNumber.length !== 16 || !cardExpiry || !cardCvc) {
+            showNotification('Пожалуйста, проверьте данные карты', 'warning');
+            return;
+        }
+    }
+    
+    // Блокируем кнопку
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Обрабатываем...';
+    
+    try {
+        // Создаем заказ
+        const order = createOrder(customerData);
+        
+        if (customerData.paymentMethod === 'cash') {
+            // Оплата наличными
+            showNotification('Заказ создан! Оплата при получении.', 'success');
+            cart = [];
+            updateCart();
+            closeCart();
+            closeCheckoutForm();
+        } else {
+            // Оплата картой
+            const paymentResult = await processPayment(order);
+            
+            if (paymentResult.success) {
+                showNotification(`Заказ №${order.id} оплачен! Спасибо за покупку!`, 'success');
+                cart = [];
+                updateCart();
+                closeCart();
+                closeCheckoutForm();
+            }
+        }
+    } catch (error) {
+        showNotification(error.error || 'Произошла ошибка при оформлении заказа', 'warning');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    }
+}
+
+function closeCheckoutForm() {
+    const checkoutOverlay = document.querySelector('.checkout-overlay');
+    if (checkoutOverlay) {
+        checkoutOverlay.remove();
+    }
 }
 
 // Cart drawer functions
@@ -245,7 +500,6 @@ function openCart() {
     const cartModal = document.getElementById('cart-modal');
     if (cartModal) {
         cartModal.classList.add('open');
-        // Focus first interactive element for accessibility
         setTimeout(() => {
             const firstButton = cartModal.querySelector('button');
             if (firstButton) firstButton.focus();
@@ -262,7 +516,6 @@ function closeCart() {
 
 // Notification system
 function showNotification(message, type = 'info') {
-    // Create notification element
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
@@ -270,7 +523,6 @@ function showNotification(message, type = 'info') {
         <button onclick="this.parentElement.remove()">&times;</button>
     `;
     
-    // Add styles if not already present
     if (!document.getElementById('notification-styles')) {
         const styles = document.createElement('style');
         styles.id = 'notification-styles';
@@ -310,7 +562,6 @@ function showNotification(message, type = 'info') {
     
     document.body.appendChild(notification);
     
-    // Auto remove after 3 seconds
     setTimeout(() => {
         if (notification.parentElement) {
             notification.remove();
@@ -326,13 +577,33 @@ function saveCartToLocalStorage() {
 function loadCartFromLocalStorage() {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
-        cart = JSON.parse(savedCart);
+        try {
+            cart = JSON.parse(savedCart);
+        } catch (error) {
+            localStorage.removeItem('cart');
+            cart = [];
+        }
+    }
+}
+
+function saveOrdersToLocalStorage() {
+    localStorage.setItem('orders', JSON.stringify(orders));
+}
+
+function loadOrdersFromLocalStorage() {
+    const savedOrders = localStorage.getItem('orders');
+    if (savedOrders) {
+        try {
+            orders = JSON.parse(savedOrders);
+        } catch (error) {
+            localStorage.removeItem('orders');
+            orders = [];
+        }
     }
 }
 
 // Временный код для очистки проблемных данных
 setTimeout(() => {
-    // Очищаем возможные поврежденные данные
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
         try {
