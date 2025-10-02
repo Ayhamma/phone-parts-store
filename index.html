@@ -24,27 +24,98 @@
             <section class="catalog">
                 <h2>Каталог запчастей</h2>
                 <div id="products-container" class="products-grid">
-                    <!-- Товары появятся здесь через JavaScript -->
+                    <!-- Товары появляются через JavaScript -->
                 </div>
             </section>
         </div>
     </main>
 
-    <!-- Профессиональная корзина-ящик -->
+    <!-- Выезжающее модальное окно (корзина + оплата) -->
     <div id="cart-modal" class="modal">
         <div class="modal-content">
             <div class="cart-header">
-                <h2>🛒 Ваша корзина</h2>
-                <button class="close">&times;</button>
+                <h2 id="cart-title">🛒 Ваша корзина</h2>
+                <button class="close" aria-label="Закрыть окно">&times;</button>
             </div>
-            <div id="cart-items" class="cart-items">
-                <p>Корзина пуста. Добавьте товары из каталога!</p>
-            </div>
-            <div class="cart-footer">
-                <div class="cart-total">
-                    <strong>Итого: <span id="total-price">0</span> руб.</strong>
+
+            <!-- Шаг 1: Корзина -->
+            <div id="step-cart" class="cart-step">
+                <div id="cart-items" class="cart-items">
+                    <p>Корзина пуста. Добавьте товары из каталога!</p>
                 </div>
-                <button id="checkout-btn" class="checkout-btn">💳 Оформить заказ</button>
+                <div class="cart-footer">
+                    <div class="cart-total">
+                        <strong>Итого: <span id="total-price">0</span> руб.</strong>
+                    </div>
+                    <button id="checkout-btn" class="checkout-btn">💳 Перейти к оплате</button>
+                </div>
+            </div>
+
+            <!-- Шаг 2: Оплата -->
+            <div id="step-payment" class="cart-step" style="display:none;">
+                <div class="cart-items" style="padding-top: 0;">
+                    <!-- Сводка заказа -->
+                    <div class="order-summary" id="order-summary"></div>
+
+                    <!-- Форма оплаты (демо) -->
+                    <form id="payment-form" novalidate>
+                        <h3 style="margin: 1rem 0 0.5rem;">Данные покупателя</h3>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label for="fullName">ФИО</label>
+                                <input id="fullName" name="fullName" type="text" required placeholder="Иванов Иван">
+                                <small class="error"></small>
+                            </div>
+                            <div class="form-field">
+                                <label for="email">E-mail</label>
+                                <input id="email" name="email" type="email" required placeholder="name@example.com">
+                                <small class="error"></small>
+                            </div>
+                            <div class="form-field">
+                                <label for="phone">Телефон</label>
+                                <input id="phone" name="phone" type="tel" required placeholder="+7 900 000-00-00">
+                                <small class="error"></small>
+                            </div>
+                            <div class="form-field form-field--full">
+                                <label for="address">Адрес доставки</label>
+                                <input id="address" name="address" type="text" required placeholder="Улица, дом, квартира">
+                                <small class="error"></small>
+                            </div>
+                        </div>
+
+                        <h3 style="margin: 1.25rem 0 0.5rem;">Данные карты (демо)</h3>
+                        <div class="form-grid">
+                            <div class="form-field form-field--full">
+                                <label for="cardNumber">Номер карты</label>
+                                <input id="cardNumber" inputmode="numeric" autocomplete="off" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                                <small class="error"></small>
+                            </div>
+                            <div class="form-field">
+                                <label for="cardExpiry">Срок</label>
+                                <input id="cardExpiry" inputmode="numeric" autocomplete="off" placeholder="MM/YY" maxlength="5" required>
+                                <small class="error"></small>
+                            </div>
+                            <div class="form-field">
+                                <label for="cardCvc">CVC</label>
+                                <input id="cardCvc" inputmode="numeric" autocomplete="off" placeholder="000" maxlength="4" required>
+                                <small class="error"></small>
+                            </div>
+                        </div>
+
+                        <div class="cart-footer">
+                            <div class="cart-total" style="margin-bottom: 0.75rem;">
+                                <strong>К оплате: <span id="payable-amount">0</span> руб.</strong>
+                            </div>
+                            <div style="display:flex; gap:.75rem;">
+                                <button type="button" id="back-to-cart" class="checkout-btn" style="background:#6b7280;">← Назад</button>
+                                <button type="submit" id="pay-btn" class="checkout-btn">Оплатить</button>
+                            </div>
+                            <p style="color:#6b7280; font-size:.85rem; margin-top:.5rem;">
+                                Демо-режим: данные карты нигде не сохраняются и не отправляются.
+                            </p>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
