@@ -23,21 +23,62 @@ const products = [
         image: "imgs/3.jpg",
         description: "Задняя крышка корпуса",
         inStock: 5
-    }
+    },
 	
-	{ id: 4, name: "Дисплей iPhone 11", price: 7600, image: "imgs/4.jpg", description: "Дисплейный модуль для iPhone 11 (LCD)", inStock: 12
+	{ 	id: 4,
+		name: "Дисплей iPhone 11",
+		price: 7600,
+		image: "imgs/4.jpg",
+		description: "Дисплейный модуль для iPhone 11 (LCD)",
+		inStock: 12
 	},
-	{ id: 5, name: "Зарядный порт iPhone 12", price: 1100, image: "imgs/5.jpg", description: "Шлейф зарядного порта iPhone 12", inStock: 20 
+	
+	{ 	id: 5,
+		name: "Зарядный порт iPhone 12",
+		price: 1100,
+		image: "imgs/5.jpg",
+		description: "Шлейф зарядного порта iPhone 12",
+		inStock: 20 
 	},
-	{ id: 6, name: "Камера задняя Samsung S21", price: 5900, image: "imgs/6.jpg", description: "Оригинальная основная камера S21", inStock: 6 
+	
+	{ 	id: 6,
+		name: "Камера задняя Samsung S21",
+		price: 5900,
+		image: "imgs/6.jpg",
+		description: "Оригинальная основная камера S21",
+		inStock: 6 
 	},
-	{ id: 7, name: "Стекло камеры Xiaomi RN10", price: 350, image: "imgs/7.jpg", description: "Защитное стекло камеры Redmi Note 10", inStock: 50 
+	
+	{ 	id: 7,
+		name: "Стекло камеры Xiaomi RN10",
+		price: 350,
+		image: "imgs/7.jpg",
+		description: "Защитное стекло камеры Redmi Note 10",
+		inStock: 50 
 	},
-	{ id: 8, name: "Аккумулятор iPhone X", price: 2400, image: "imgs/8.jpg", description: "Li-Ion аккумулятор для iPhone X", inStock: 9 
+	
+	{ 	id: 8,
+		name: "Аккумулятор iPhone X",
+		price: 2400,
+		image: "imgs/8.jpg",
+		description: "Li-Ion аккумулятор для iPhone X",
+		inStock: 9 
 	},
-	{ id: 9, name: "Защитное стекло 6.1″", price: 300, image: "imgs/9.jpg", description: "Закалённое стекло для 6.1″ (12/12 Pro/13/14)", inStock: 100 
+	
+	{ 	id: 9,
+		name: "Защитное стекло 6.1″",
+		price: 300,
+		image: "imgs/9.jpg",
+		description: "Закалённое стекло для 6.1″ (12/12 Pro/13/14)",
+		inStock: 100 
 	},
-	{ id: 10, name: "Кабель USB-C → Lightning", price: 700, image: "imgs/10.jpg", description: "Кабель быстрой зарядки 1 м", inStock: 40 
+	
+	{ 	id: 10,
+		name: "Кабель USB-C → Lightning",
+		price: 700,
+		image: "imgs/10.jpg",
+		description: "Кабель быстрой зарядки 1 м",
+		inStock: 40 
 	}
 ];
 
