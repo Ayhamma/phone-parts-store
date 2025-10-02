@@ -499,3 +499,33 @@ body {
 @media (max-width: 768px) {
   .form-grid { grid-template-columns: 1fr; }
 }
+
+
+/* === Fix: прокрутка в правой панели + липкий футер === */
+.modal-content {
+  height: 100vh;              /* вся высота окна */
+  overflow-y: auto;           /* прокрутка внутри панели */
+  -webkit-overflow-scrolling: touch; /* плавный скролл на мобильных */
+}
+
+.cart-step {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.cart-items {
+  flex: 1 1 auto;
+  min-height: 0;              /* важно, чтобы flex-элемент давал место скроллу */
+  overflow-y: auto;           /* список/форма прокручиваются */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* футер заказа (кнопка «Оплатить») всегда виден снизу */
+.cart-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+}
